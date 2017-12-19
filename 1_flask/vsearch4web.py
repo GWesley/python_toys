@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request 
+from flask import Flask, render_template, request, redirect 
 app = Flask(__name__)
 
 @app.route('/')
-def hello() -> str:
-    return 'Hello world from Flask!' 
+@app.route('/entry')
+def entry_page() -> 'html':
+    return render_template('entry.html',
+                            the_title='Welcome to search4letters on the web!',
+                            )
 
 @app.route('/search4', methods=["POST"])
 def do_search() -> str:
@@ -15,10 +18,5 @@ def do_search() -> str:
                             the_letters=letters,
                             the_result='what ever'
                             )
-
-@app.route('/entry')
-def entry_page() -> 'html':
-    return render_template('entry.html',
-                            the_title='Welcome to search4letters on the web!',
-                            )
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
