@@ -26,12 +26,21 @@ def do_search() -> str:
 @app.route('/viewlog')
 def view_the_log() -> str:
     with open('vsearch.log') as log :
-        contents = log.read()
-        return escape(contents)
+        contents = []
+        for line in log:
+            contents.append([])
+            for item in line.split('|'):
+                contents[-1].append(item)
+
+        return render_template('viewlog.html',
+                                the_title='View Log',
+                                the_row_titles=['FormData','Remote_addr','User_agent','Results'],
+                                the_data=contents,
+                                )        
 
 def log_request(req: 'flask_request', res: str) -> None:
     with open('vsearch.log','a') as log:
-        print(req, res, file=log)
+        print(req.form, req.remote_addr, req.user_agent, res, file=log, sep='|')
 
 
 if __name__ == '__main__':
