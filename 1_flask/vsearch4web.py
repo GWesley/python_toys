@@ -29,12 +29,12 @@ def do_search() -> str:
 @app.route('/viewlog')
 def view_the_log() -> str:
     cursor = conn.cursor()
-    _SQL = """select * from log"""
+    _SQL = """select phrase, letters, ip, browser_string, results from log"""
     cursor.execute(_SQL)
     contents = cursor.fetchall()
     return render_template('viewlog.html',
                             the_title='View Log',
-                            the_row_titles=['FormData','Remote_addr','User_agent','Results'],
+                            the_row_titles=['Phrase','Letter','Remote_addr','User_agent','Results'],
                             the_data=contents,
                             )        
 
