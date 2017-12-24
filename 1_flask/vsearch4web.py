@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, escape
-import mysql.connector
+from DBcm import UseDatabase, ConnectionError,CredentialsError
+import mysql.connector 
 
 app = Flask(__name__)
 dbconfig = {'host':'127.0.0.1','user':'root','password':'','database':'vsearchlogDB'}
@@ -18,7 +19,11 @@ def do_search() -> str:
     phrase = request.form['phrase'] 
     letters = request.form['letters']
     result = 'what ever'
-    log_request(request, result)
+    try:
+        log_request(request, result)
+    except Exception as err:
+        print('***** Logging failed with this error:', str(err))
+    
     return render_template('results.html',
                             the_title='Here are your result',
                             the_phrase=phrase,
@@ -28,15 +33,23 @@ def do_search() -> str:
 
 @app.route('/viewlog')
 def view_the_log() -> str:
-    cursor = conn.cursor()
-    _SQL = """select phrase, letters, ip, browser_string, results from log"""
-    cursor.execute(_SQL)
-    contents = cursor.fetchall()
-    return render_template('viewlog.html',
+    try:
+        with UseDataBase(dbconfig) as cursor:
+            _SQL = """select phrase, letters, ip, browser_string, results from log"""
+            cursor.execute(_SQL)
+            contents = cursor.fetchall()
+        return render_template('viewlog.html',
                             the_title='View Log',
                             the_row_titles=['Phrase','Letter','Remote_addr','User_agent','Results'],
                             the_data=contents,
-                            )        
+                            )   
+    except ConnectionError as err:
+        print('Is your database switched on? Error:', str(err))
+    except ConnectionError as err:
+        print('User-id/Password issues. Error:', str(err))  
+    except Exception as err:
+        print('Something went wrong:', str(err))
+    return 'Something went wrong'    
 
 def log_request(req: 'flask_request', res: str) -> None:
     cursor = conn.cursor()
