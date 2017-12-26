@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, escape
 from DBcm import UseDatabase, ConnectionError,CredentialsError
-import mysql.connector 
+import mysql.connector
+from threading import Thread 
 
 app = Flask(__name__)
 dbconfig = {'host':'127.0.0.1','user':'root','password':'','database':'vsearchlogDB'}
