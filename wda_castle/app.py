@@ -5,16 +5,12 @@ import time
 # wda.DEBUG = True
 c = wda.Client('http://localhost:8100')
 
-s = c.session('com.hotrizon.hvideo')
-print(s.orientation)
+s = c.session('com.my.hc.rpg.kingdom.simulator')
 
 print(s.window_size())
 
 # e = s(text='街舞').tap()
 
-n = 0
-while n < 10:
-    n = n + 1
-    s.swipe_up()
-    s.tap(200, 200)
-    time.sleep(4)
+time.sleep(10)
+
+c.screenshot('screen.png')
