@@ -17,4 +17,4 @@ def sendMail(subject, body):
         s.send_message(msg)
         s.quit()
 
-sendMail("test", "testbody")    
+sendMail("小瘦仔发来一条提醒", "移民状态更新啦！ 打开看看吧： http://qq.com ")    
