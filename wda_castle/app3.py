@@ -5,7 +5,7 @@ import time
 import pytesseract
 from PIL import Image
 import re
-
+from threading import Thread
 
 d = atx.connect('8ee8d717') # 如果多个手机连接电脑，则需要填入对应的设备号
 # d.disable_popups()
@@ -80,7 +80,6 @@ def wait_click(image_path, timeout=240):
     d.click_exists(image_path)
 
 def auto_arena(food=True):
-    print("== start round == %d" % arena_round)
 
     food = False
     # traceback.print_exc()
@@ -104,6 +103,8 @@ def auto_arena(food=True):
         print("tickets arena")
         d.click_exists("imgs2/arena/tickets@auto.png")
 
+    print("== start round == %d" % arena_round)
+    
     wait_click("imgs2/arena/start@auto.png")
     wait_click("imgs2/confirm@auto.png")
 
@@ -130,12 +131,14 @@ def find_rival(timeout=3):
             n = n + 1
             wait_click("imgs2/arena/%d@auto.png" % n)
             time.sleep(3)
+            
             if d.exists('imgs2/arena/disable@auto.png'):
                 wait_click("imgs2/arena/close@auto.png")
                 print('can not fight')
                 continue
 
             if not d.exists("imgs2/arena/close@auto.png") :
+                print("no close btn")
                 continue
 
             d.screenshot('screen.png')
@@ -217,16 +220,40 @@ def did_win():
     #     time.sleep(5)
     #     auto_arena()
 
+class ThreadWithReturnValue(Thread):  
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None):  
+        Thread.__init__(self, group, target, name, args, kwargs, daemon=daemon)  
+  
+        self._return = None  
+  
+    def run(self):  
+        if self._target is not None:  
+            self._return = self._target(*self._args, **self._kwargs)  
+  
+    def join(self):  
+        Thread.join(self)  
+        return self._return      
+
 def should_win(img_path):
-    p1 = get_power(img_path, (600, 470, 820, 510), True)
-    p2 = get_power(img_path, (1055, 470, 1280, 510), False)
+    t1 = ThreadWithReturnValue(target=get_power,args=(img_path, (600, 470, 820, 510),))
+    t1.start()
+    t2 = ThreadWithReturnValue(target=get_power,args=(img_path, (1055, 470, 1280, 510),))
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+    p1 = t1._return
+    p2 = t2._return
+    # p1 = get_power(img_path, (600, 470, 820, 510))
+    # p2 = get_power(img_path, (1055, 470, 1280, 510))
     print('战斗力：%d vs %d' % (p1, p2))
     if  p1 == 1000000 or p2 == 1000000:
         find_rival(3)
-    p2 += 15000
+    p2 += 10000
     return p1 > p2
 
-def get_power(img_path, box, me):
+def get_power(img_path, box):
 
     with Image.open(img_path) as img:
         crop = img.crop(box)
@@ -257,6 +284,7 @@ def safe():
     try:
         auto_arena()
     except Exception as e:
+        print("!!!! %s" % str(e))
         safe()
     # else:
         # safe()
