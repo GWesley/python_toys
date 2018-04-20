@@ -278,6 +278,14 @@ def get_power(img_path, box):
             print("not catch")
             return 1000000
 
+def open_next(count):
+    while count > 0:
+        count -= 1
+        print(str(count))
+        wait_click("imgs2/jump/next@auto.png",10)
+
+    
+
 
 # clear_moods(10)
 def safe():
@@ -290,6 +298,6 @@ def safe():
         # safe()
 
 
-safe()
+# safe()
 # auto_door()
-
+# open_next(100)
