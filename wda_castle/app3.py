@@ -38,42 +38,42 @@ def clear_moods(inc):
     t.start()
     print("clear_moods")
 
-# def claim_reward(inc):
-#     d.click_exists("imgs2/update@auto.png")
-#     time.sleep(2)
-#     d.wait_gone("imgs2/loading@auto.png")
-#
-#     if d.exists('imgs2/arena/end@auto.png'):
-#         print("结束")
-#         d.click_exists('imgs2/arena/end@auto.png')
-#         time.sleep(5)
-#         auto_arena()
-#     elif  d.exists("imgs2/jump/map@auto.png"):
-#         auto_arena()
-#
-#     t = Timer(inc, claim_reward, (inc,))
-#     t.start()
-
 def auto_door():
     print("enter map")
-    time.sleep(3)
     d.click_exists("imgs2/jump/map@auto.png")
     time.sleep(3)
     if  d.click_exists("imgs2/jump/door@auto.png") :
         time.sleep(3)
         print("enter door")
-        # d.swipe(1000, 1000, 1000, 400)
-        d.swipe(1000, 1000, 1000, 300)
-        time.sleep(5)
-        d.click_exists("imgs2/jump/7@auto.png")
-        time.sleep(5)
-        d.click_exists("imgs2/jump/attack@auto.png")
-        time.sleep(5)
-        if d.exists("imgs2/jump/warning@auto.png") :
-            time.sleep(60)
-            d.click_exists("imgs2/jump/yes@auto.png")
-    else:
-        auto_door()
+        find_level()
+    elif d.exists("imgs2/jump/store@auto.png") :
+        find_level()
+    else :
+        auto_door()       
+
+def find_level() :
+    print("find level")
+    # d.swipe(1000, 1000, 1000, 400)
+    d.swipe(1000, 1000, 1000, 300)
+    time.sleep(5)
+    if d.exists("imgs2/jump/47@auto.png"):
+        d.click_exists("imgs2/jump/47@auto.png")
+    else :
+        find_level()    
+    time.sleep(5)
+    d.click_exists("imgs2/jump/attack@auto.png")
+    time.sleep(5)
+    if d.exists("imgs2/jump/warning@auto.png") :
+        print("警告")
+        time.sleep(30)
+        d.click_exists("imgs2/jump/yes@auto.png")
+
+    wait_click("imgs2/arena/x1@auto.png", timeout=20)
+    wait_click("imgs2/arena/x2@auto.png", timeout=20)
+    wait_click("imgs2/jump/door_home@auto.png", timeout=60)
+    time.sleep(30)
+    auto_door()
+    
 
 def wait_click(image_path, timeout=240):
     d.wait(image_path, timeout)
@@ -250,7 +250,7 @@ def should_win(img_path):
     print('战斗力：%d vs %d' % (p1, p2))
     if  p1 == 1000000 or p2 == 1000000:
         find_rival(3)
-    p2 += 10000
+    # p1 += 20000
     return p1 > p2
 
 def get_power(img_path, box):
@@ -291,11 +291,10 @@ def open_next(count):
 def safe():
     try:
         auto_arena()
+        # auto_door()
     except Exception as e:
         print("!!!! %s" % str(e))
         safe()
-    # else:
-        # safe()
 
 
 # safe()
